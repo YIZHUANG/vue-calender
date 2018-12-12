@@ -82,11 +82,55 @@ function getCurrentWeekNumber(date) {
   }
 }
 
+function getMonthsInAYear() {
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+  ];
+  const monthsData = [];
+  months.forEach((item, index) => {
+    monthsData.push({
+      month: item,
+      number: index + 1
+    });
+  });
+  return monthsData;
+}
+
+function get20YearsInRange(date) {
+  const currentYear = format(date, 'YYYY');
+  let downCount = 10;
+  let upCount = 0;
+  let downYears = [];
+  let upYears = [];
+  while(downCount !==0) {
+    downCount --;
+    downYears.push(currentYear - downCount)
+  }
+  while(upCount <= 10 ) {
+    upCount ++;
+    upYears.push(Number(currentYear) + Number(upCount))
+  }
+  return [...downYears, ...upYears]
+}
+
 export {
   ifDateHasPass,
   ifItsSameDay,
   ifItsSameHour,
   renderDayNames,
   renderDaysInMonth,
-  getCurrentWeekNumber
+  getCurrentWeekNumber,
+  getMonthsInAYear,
+  get20YearsInRange
 };

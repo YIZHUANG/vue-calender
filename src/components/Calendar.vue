@@ -1,19 +1,25 @@
 <template>
+  <!-- eslint-disable -->
   <div class='vue-simple-calendar'>
-    <h1>You have selected {{currentDateDetail}}</h1>
     <DatePicker
       :currentDate='currentDate'
       :changeDate='changeDate'
       :selectView='selectView'
       :onShowDatePicker='onShowDatePicker'
-      :onDatePickerClick='onDatePickerClick'
       :daysNames='daysNames'
       :daysInAMonth='daysInAMonth'
-      :currentMonthYear='currentMonthYear'
+      :currentMonth='currentMonth'
+      :currentYear='currentYear'
       :toPreviousMonth='toPreviousMonth'
       :toNextMonth='toNextMonth'
+      :changeMonth='changeMonth'
+      :showMonthlyDropdown= 'showMonthlyDropdown'
+      :onMonthClick='onMonthClick'
+      :changeYear='changeYear'
+      :showYearlyDropdown= 'showYearlyDropdown'
+      :onYearClick='onYearClick'
       v-if='showDatePicker'
-      />
+    />
   </div>
 </template>
 
@@ -22,6 +28,8 @@ import addMonths from "date-fns/add_months";
 import subMonths from "date-fns/sub_months";
 import format from "date-fns/format";
 import getDate from "date-fns/get_date";
+import setMonth from "date-fns/set_month";
+import setYear from "date-fns/set_year";
 
 import DatePicker from "./DatePicker.vue";
 
@@ -30,8 +38,7 @@ import {
   ifItsSameDay,
   ifItsSameHour,
   renderDayNames,
-  renderDaysInMonth,
-  getCurrentWeekNumber
+  renderDaysInMonth
 } from "../utils";
 
 export default {
@@ -39,7 +46,9 @@ export default {
     return {
       showDatePicker: true,
       currentDate: new Date(),
-      selectedView: "monthly"
+      selectedView: "monthly",
+      showMonthlyDropdown: false,
+      showYearlyDropdown: false
     };
   },
   components: {
@@ -55,12 +64,29 @@ export default {
     onShowDatePicker() {
       this.showDatePicker !== this.showDatePicker;
     },
-    onDatePickerClick(view, date) {},
     toPreviousMonth() {
       this.currentDate = subMonths(this.currentDate, 1);
     },
     toNextMonth() {
       this.currentDate = addMonths(this.currentDate, 1);
+    },
+    changeMonth(month) {
+      this.currentDate = setMonth(this.currentDate, month - 1);
+    },
+    onMonthClick(close = false) {
+      if (close) {
+        this.showMonthlyDropdown = false;
+      } else this.showMonthlyDropdown = !this.showMonthlyDropdown;
+      this.showYearlyDropdown = false;
+    },
+    changeYear(year) {
+      this.currentDate = setYear(this.currentDate, year);
+    },
+    onYearClick(close = false) {
+      if (close) {
+        this.showYearlyDropdown = false;
+      } else this.showYearlyDropdown = !this.showYearlyDropdown;
+      this.showMonthlyDropdown = false;
     }
   },
   computed: {
@@ -70,14 +96,11 @@ export default {
     daysInAMonth() {
       return renderDaysInMonth(this.currentDate);
     },
-    currentMonthYear() {
-      return format(this.currentDate, "MMMM YYYY");
+    currentMonth() {
+      return format(this.currentDate, "MMMM");
     },
-    currentDateDetail() {
-      const dayFormat = "dddd";
-      const dayName = format(this.currentDate, dayFormat);
-      const dayNumber = getDate(this.currentDate);
-      return `${this.currentMonthYear} ${dayName} ${dayNumber}`;
+    currentYear() {
+      return format(this.currentDate, "YYYY");
     }
   }
 };
