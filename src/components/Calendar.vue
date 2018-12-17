@@ -1,6 +1,21 @@
 <template>
   <!-- eslint-disable -->
-  <div class='vue-simple-calendar'>
+  <div class='vue-calendar'>
+    <div class="vue-calendar__content">
+      <Header
+        :onShowDatePicker="onShowDatePicker"
+        :selectedView="selectedView"
+        :currentDate="currentDate"
+        :changeDate="changeDate"
+        :selectView="selectView"
+      />
+      <MonthlyView
+        :currentDate="currentDate"
+        :daysNames="daysNames"
+        :daysInAMonth="daysInAMonth"
+        v-if="selectedView==='monthly'"
+      />
+    </div>
     <DatePicker
       :currentDate='currentDate'
       :changeDate='changeDate'
@@ -18,7 +33,9 @@
       :changeYear='changeYear'
       :showYearlyDropdown= 'showYearlyDropdown'
       :onYearClick='onYearClick'
-      v-if='showDatePicker'
+      :datePickerDropdownYears="datePickerDropdownYears"
+      v-if='ifShowDatePicker'
+      ref="datePicker"
     />
   </div>
 </template>
@@ -31,7 +48,9 @@ import getDate from "date-fns/get_date";
 import setMonth from "date-fns/set_month";
 import setYear from "date-fns/set_year";
 
+import Header from "./Header.vue";
 import DatePicker from "./DatePicker.vue";
+import MonthlyView from "./MonthlyView.vue";
 
 import {
   ifDateHasPass,
@@ -52,14 +71,40 @@ export default {
     };
   },
   components: {
-    DatePicker
+    MonthlyView,
+    DatePicker,
+    Header
+  },
+  props: {
+    onDatePickerChangeDate: {
+      type: Function,
+      default: () => {}
+    },
+    datePickerDropdownYears: {
+      type: Function,
+      default: () => null
+    },
+    keepDatePickerOpen: {
+      type: Boolean,
+      default: false
+    }
+  },
+  mounted() {
+    document.addEventListener("click", this.handleClickOutside);
+  },
+  beforeDestroy() {
+    document.removeEventListener("click", this.handleClickOutside);
   },
   methods: {
     selectView(view) {
-      this.selectView = view;
+      this.selectedView = view;
     },
     changeDate(date) {
       this.currentDate = date;
+      this.onDatePickerChangeDate(this.selectedView, date);
+      if(this.showDatePicker) {
+        this.showDatePicker = false;
+      }
     },
     onShowDatePicker() {
       this.showDatePicker !== this.showDatePicker;
@@ -87,6 +132,19 @@ export default {
         this.showYearlyDropdown = false;
       } else this.showYearlyDropdown = !this.showYearlyDropdown;
       this.showMonthlyDropdown = false;
+    },
+    onShowDatePicker() {
+      this.showDatePicker = !this.showDatePicker;
+    },
+    handleClickOutside(e) {
+      if (this.showDatePicker) {
+        if (
+          this.$refs.datePicker &&
+          !e.path.includes(this.$refs.datePicker.$el)
+        ) {
+          this.showDatePicker = false;
+        }
+      }
     }
   },
   computed: {
@@ -101,13 +159,21 @@ export default {
     },
     currentYear() {
       return format(this.currentDate, "YYYY");
+    },
+    ifShowDatePicker() {
+      return this.keepDatePickerOpen
+        ? this.keepDatePickerOpen
+        : this.showDatePicker;
     }
   }
 };
 </script>
 
 <style lang='scss' scoped>
-.vue-simple-calendar {
+.vue-calendar {
   position: relative;
+  &__content {
+    padding: 0 40px;
+  }
 }
 </style>

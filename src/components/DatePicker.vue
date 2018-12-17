@@ -4,9 +4,9 @@
     <div class='datePicker--content'>
       <div class='datePicker--top'>
         <button @click='toPreviousMonth()' class='arrow datePicker-to-previous-month' />
-        <div class='datePicker-month-display'>
-          <span @click='onMonthClick()'>{{currentMonth}}</span>
-          <span @click='onYearClick()'> {{currentYear}}</span>
+        <div class='datePicker-display'>
+          <span class='datePicker-display--month' @click='onMonthClick()'>{{currentMonth}}</span>
+          <span class='datePicker-display--year' @click='onYearClick()'> {{currentYear}}</span>
         </div>
         <button @click='toNextMonth()' class='arrow datePicker-to-next-month' />
       </div>
@@ -18,7 +18,7 @@
           <div>
             <div
               class='datePicker--bottom--day'
-              v-for='day in correspondDates(dayName)'
+              v-for='day in correspondDates(daysInAMonth,dayName)'
               v-bind:class="{
                 'datePicker-isSameDay': ifItsSameDay(day.date,currentDate),
                 'datePicker-hasPass': ifDateHasPass(day.date)
@@ -42,7 +42,7 @@
       v-if='showYearlyDropdown'
       :onChangeYear='onChangeYear'
       ref="dropdownYear"
-      :dropDownValues='get20YearsInRange(currentYear)'
+      :dropDownValues='dropdownYears || get20YearsInRange(currentYear)'
       :type="'year'"
     />
   </div>
@@ -57,7 +57,8 @@ import {
   renderDaysInMonth,
   getCurrentWeekNumber,
   getMonthsInAYear,
-  get20YearsInRange
+  get20YearsInRange,
+  correspondDates
 } from "../utils";
 import DropDown from "./DropDown";
 
@@ -67,7 +68,9 @@ export default {
       ifItsSameDay,
       ifDateHasPass,
       getMonthsInAYear,
-      get20YearsInRange
+      get20YearsInRange,
+      correspondDates,
+      dropdownYears: null
     };
   },
   components: {
@@ -89,8 +92,15 @@ export default {
     "onMonthClick",
     "showYearlyDropdown",
     "changeYear",
-    "onYearClick"
+    "onYearClick",
+    "datePickerDropdownYears"
   ],
+  created() {
+    const getDropdownYears = this.datePickerDropdownYears();
+    if (getDropdownYears) {
+      this.dropdownYears = getDropdownYears;
+    }
+  },
   mounted() {
     document.addEventListener("click", this.handleClickOutside);
   },
@@ -98,9 +108,6 @@ export default {
     document.removeEventListener("click", this.handleClickOutside);
   },
   methods: {
-    correspondDates(dayName) {
-      return this.daysInAMonth.filter(day => day.dayName === dayName);
-    },
     onChangeMonth(month) {
       this.changeMonth(month);
       this.onMonthClick(true);
@@ -132,6 +139,11 @@ export default {
   position: absolute;
   width: 250px;
   max-width: 250px;
+  right: 0;
+  bottom: 0;
+  top: 80%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   &-month-display {
     color: #000;
     font-weight: bold;
@@ -167,12 +179,17 @@ export default {
       padding: 2px;
       cursor: pointer;
       &:hover {
-        background-color: #f0f0f0;
+        background-color: rgb(228, 231, 231);
       }
     }
   }
   &-hasPass {
-    background-color: #f0f0f9;
+    background-color: rgb(255, 255, 255);
+    color: rgb(202, 204, 205);
+    cursor: initial;
+    &:hover {
+      background-color: rgb(255, 255, 255);
+    }
   }
 }
 .datePicker-to-previous-month {
@@ -193,7 +210,18 @@ export default {
 }
 .datePicker-isSameDay {
   border-radius: 0.3rem;
-  background-color: #216ba5;
+  background-color: rgb(130, 136, 138);
   color: white;
+  &:hover {
+    background-color: rgb(130, 136, 138);
+  }
+}
+.datePicker-display {
+  &--month {
+    cursor: pointer;
+  }
+  &--year {
+    cursor: pointer;
+  }
 }
 </style>

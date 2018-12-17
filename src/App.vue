@@ -1,6 +1,10 @@
 <template>
   <div>
-    <Calendar />
+    <Calendar
+      :onDatePickerChangeDate="onDatePickerChangeDate"
+      :DatePickerDropdownYears="renderDatePickerDropdownYears"
+      :keepDatePickerOpen="false"
+    />
   </div>
 </template>
 
@@ -11,6 +15,14 @@ export default {
   name: 'app',
   components: {
     Calendar
+  },
+  methods: {
+    onDatePickerChangeDate(view, date) {
+      console.log(view,date)
+    },
+    renderDatePickerDropdownYears(currentDate) {
+      return [2011,2012,2013,2014,2015,2016]
+    }
   }
 }
 </script>

@@ -82,6 +82,14 @@ function getCurrentWeekNumber(date) {
   }
 }
 
+function getCurrentWeekInRange(date, weekFormat) {
+  const startOfTheWeek = startOfWeek(date);
+  const endOfTheWeek = endOfWeek(date);
+  const startWeekDate = format(startOfTheWeek, weekFormat);
+  const endWeekDate = format(endOfTheWeek, weekFormat);
+  return `${startWeekDate} - ${endWeekDate}`;
+}
+
 function getMonthsInAYear() {
   const months = [
     "January",
@@ -108,22 +116,25 @@ function getMonthsInAYear() {
 }
 
 function get20YearsInRange(date) {
-  const currentYear = format(date, 'YYYY');
+  const currentYear = format(date, "YYYY");
   let downCount = 10;
   let upCount = 0;
   let downYears = [];
   let upYears = [];
-  while(downCount !==0) {
-    downCount --;
-    downYears.push(currentYear - downCount)
+  while (downCount !== 0) {
+    downCount--;
+    downYears.push(currentYear - downCount);
   }
-  while(upCount <= 10 ) {
-    upCount ++;
-    upYears.push(Number(currentYear) + Number(upCount))
+  while (upCount <= 10) {
+    upCount++;
+    upYears.push(Number(currentYear) + Number(upCount));
   }
-  return [...downYears, ...upYears]
+  return [...downYears, ...upYears];
 }
 
+function correspondDates(dayPool, dayName) {
+  return dayPool.filter(day => day.dayName === dayName);
+}
 export {
   ifDateHasPass,
   ifItsSameDay,
@@ -132,5 +143,7 @@ export {
   renderDaysInMonth,
   getCurrentWeekNumber,
   getMonthsInAYear,
-  get20YearsInRange
+  get20YearsInRange,
+  getCurrentWeekInRange,
+  correspondDates
 };
